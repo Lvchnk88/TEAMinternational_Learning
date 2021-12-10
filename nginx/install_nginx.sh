@@ -1,7 +1,7 @@
 #!/bin/bash
 
 install_nginx () {
-    sudo apt install nginx -y
+    sudo apt install nginx -y &> $log_path/tmp.log
 
 if [ $? -eq 0 ];
       then
@@ -14,7 +14,7 @@ fi
 }
 
 stop_service () {
-    nginx -s quit
+    nginx -s quit  &> $log_path/tmp.log
 
 if [ $? -eq 0 ];
       then
@@ -27,7 +27,7 @@ fi
 }
 
 replace_configs () {
-    cp /srv/TEAMinternational_Learning/nginx/nginx.conf            /etc/nginx/
+    cp /srv/TEAMinternational_Learning/nginx/nginx.conf  /etc/nginx/ &> $log_path/tmp.log
 if [ $? -eq 0 ];
       then
             info "nginx.conf  complete"
@@ -37,7 +37,7 @@ if [ $? -eq 0 ];
       exit 1
 fi
 
-    cp /srv/TEAMinternational_Learning/nginx/conf.d                /etc/nginx/conf.d/
+    cp /srv/TEAMinternational_Learning/nginx/conf.d  /etc/nginx/conf.d/ &> $log_path/tmp.log
 if [ $? -eq 0 ];
       then
             info "conf.d complete"
@@ -47,7 +47,7 @@ if [ $? -eq 0 ];
       exit 1
 fi
 
-    cp /srv/TEAMinternational_Learning/nginx/sites-enabled/        /etc/nginx/sites-enabled/
+    cp /srv/TEAMinternational_Learning/nginx/sites-enabled/ /etc/nginx/sites-enabled/ &> $log_path/tmp.log
 if [ $? -eq 0 ];
       then
             info "sites-enabled complete"
@@ -60,7 +60,7 @@ fi
 }
 
 start_service () {
-    nginx -s reload
+    nginx -s reload    &> $log_path/tmp.log
 
 if [ $? -eq 0 ];
       then
@@ -75,18 +75,13 @@ fi
 main () {
 
 install_nginx
-sleep 5
 
 stop_service
-sleep 5
 
 replace_configs
-sleep 5
 
 start_service
 
 }
 
 main
-
-
