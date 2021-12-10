@@ -1,7 +1,9 @@
 #!/bin/bash
 
+GIT_REPO=/srv/TEAMinternational_Learning
+
 install_mysql () {
-    sudo apt install mysql-server -y
+    sudo apt install mysql-server -y &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
             info "install mysql-server complete"
@@ -11,7 +13,7 @@ install_mysql () {
       exit 1
     fi
 
-    sudo systemctl enable mysql.service
+    sudo systemctl enable mysql.service &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
             info "enable mysql.service complete"
@@ -23,7 +25,7 @@ install_mysql () {
 }
 
 stop_mysql () {
-    sudo systemctl stop mysql.service
+    sudo systemctl stop mysql.service &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
             info "stop mysql complete"
@@ -35,7 +37,7 @@ stop_mysql () {
 }
 
 replace_configs () {
-    cp /home/sergii/TEAMinternational_Learning/mysql/mysql.cnf       /etc/mysql/
+    cp $GIT_REPO/mysql/mysql.cnf /etc/mysql/ &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
             info "replace mysql.cnf complete"
@@ -44,7 +46,7 @@ replace_configs () {
             error "replace mysql.cnf failed"
       exit 1
     fi
-    cp /home/sergii/TEAMinternational_Learning/mysql/mysqldump.cnf   /etc/mysql/
+    cp $GIT_REPO/mysql/mysqldump.cnf /etc/mysql/ &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
             info "replace mysqldump.cnf complete"
@@ -53,7 +55,7 @@ replace_configs () {
             error "replace mysqldump.cnf failed"
       exit 1
     fi
-    cp /home/sergii/TEAMinternational_Learning/mysql/mysql.conf.d/*  /etc/mysql/mysql.conf.d/
+    cp $GIT_REPO/mysql/mysql.conf.d/* /etc/mysql/mysql.conf.d/ &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
             info "replace mysql.conf.d/ complete"
@@ -62,7 +64,7 @@ replace_configs () {
             error "replace mysql.conf.d/ failed"
       exit 1
     fi
-    cp /home/sergii/TEAMinternational_Learning/mysql/conf.d/*        /etc/mysql/conf.d/
+    cp $GIT_REPO/mysql/conf.d/* /etc/mysql/conf.d/ &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
             info "replace conf.d/ complete"
@@ -75,7 +77,7 @@ replace_configs () {
 }
 
 start_mysql () {
-    sudo systemctl start mysql.service
+    sudo systemctl start mysql.service    &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
             info "start mysql.service complete"
@@ -90,16 +92,14 @@ start_mysql () {
 main () {
 
 install_mysql
-sleep 5
 
 stop_mysql
 sleep 5
 
 replace_configs
-sleep 5
 
 start_mysql
-
+sleep 5
 }
 
 main

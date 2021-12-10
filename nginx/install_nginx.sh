@@ -1,5 +1,7 @@
 #!/bin/bash
 
+GIT_REPO=/srv/TEAMinternational_Learning
+
 install_nginx () {
     sudo apt install nginx -y &> $log_path/tmp.log
 
@@ -27,7 +29,7 @@ fi
 }
 
 replace_configs () {
-    cp /srv/TEAMinternational_Learning/nginx/nginx.conf  /etc/nginx/ &> $log_path/tmp.log
+    cp $GIT_REPO/nginx/nginx.conf  /etc/nginx/ &> $log_path/tmp.log
 if [ $? -eq 0 ];
       then
             info "nginx.conf  complete"
@@ -37,7 +39,7 @@ if [ $? -eq 0 ];
       exit 1
 fi
 
-    cp /srv/TEAMinternational_Learning/nginx/conf.d  /etc/nginx/conf.d/ &> $log_path/tmp.log
+    cp $GIT_REPO/nginx/conf.d  /etc/nginx/conf.d/ &> $log_path/tmp.log
 if [ $? -eq 0 ];
       then
             info "conf.d complete"
@@ -47,7 +49,7 @@ if [ $? -eq 0 ];
       exit 1
 fi
 
-    cp /srv/TEAMinternational_Learning/nginx/sites-enabled/ /etc/nginx/sites-enabled/ &> $log_path/tmp.log
+    cp $GIT_REPO/nginx/sites-enabled/ /etc/nginx/sites-enabled/ &> $log_path/tmp.log
 if [ $? -eq 0 ];
       then
             info "sites-enabled complete"
@@ -85,3 +87,4 @@ start_service
 }
 
 main
+
