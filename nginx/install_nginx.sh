@@ -14,10 +14,58 @@ error () {
 
 #=======================================
 
-install_nginx () {
-    apt install nginx -y     &> $log_path/tmp.log
+GIT_REPO="/srv/TEAMinternational_Learning"
 
-if [ $? -eq 0 ];
+pre_install_nginx () {
+#Install the prerequisites
+    apt install curl gnupg2 ca-certificates lsb-release ubuntu-archive-keyring  &> $log_path/tmp.log
+    if [ $? -eq 0 ];
+      then
+            info "Install the prerequisites complete"
+      else
+            tail -n20 $log_path/tmp.log
+            error "Install the prerequisites failed"
+      exit 1
+fi
+
+#Import an official nginx signing key so apt could verify the packages authenticity. Fetch the key
+    curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor | sudo tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null  &> $log_path/tmp.log
+    if [ $? -eq 0 ];
+      then
+            info "Import an official nginx signing key complete"
+      else
+            tail -n20 $log_path/tmp.log
+            error "Import an official nginx signing key failed"
+      exit 1
+fi
+
+#Verify that the downloaded file contains the proper key
+    gpg --dry-run --quiet --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg  &> $log_path/tmp.log
+    if [ $? -eq 0 ];
+      then
+            info "Verify that the downloaded file complete"
+      else
+            tail -n20 $log_path/tmp.log
+            error "Verify that the downloaded file failed"
+      exit 1
+fi
+
+#set up the apt repository for stable nginx packages
+    echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg]  http://nginx.org/packages/ubuntu `lsb_release -cs` nginx" | sudo tee /etc/apt/sources.list.d/nginx.list  &> $log_path/tmp.log
+    if [ $? -eq 0 ];
+      then
+            info "set up the apt repository for stable nginx complete"
+      else
+            tail -n20 $log_path/tmp.log
+            error "set up the apt repository for stable nginx failed"
+      exit 1
+fi
+}
+
+install_nginx () {
+    sudo apt update
+    sudo apt install nginx   &> $log_path/tmp.log
+    if [ $? -eq 0 ];
       then
             info "install_nginx complete"
       else
@@ -41,36 +89,25 @@ fi
 }
 
 replace_configs () {
-    cp /srv/TEAMinternational_Learning/nginx/nginx.conf   /etc/nginx/   &> $log_path/tmp.log
+    cp $GIT_REPO/nginx/nginx.conf   /etc/nginx/   &> $log_path/tmp.log
 if [ $? -eq 0 ];
       then
-            info "nginx.conf  complete"
+            info "replace nginx.conf  complete"
       else
             tail -n20 $log_path/tmp.log
-            error "nginx.conf  failed"
+            error "replace nginx.conf  failed"
       exit 1
 fi
 
-    cp -r /srv/TEAMinternational_Learning/nginx/conf.d/*   /etc/nginx/conf.d/   &> $log_path/tmp.log
+    cp -r $GIT_REPO/nginx/sites-enabled/*  /etc/nginx/sites-enabled/  &> $log_path/tmp.log
 if [ $? -eq 0 ];
       then
-            info "conf.d complete"
+            info "replace sites-enabled complete"
       else
             tail -n20 $log_path/tmp.log
-            error "conf.d failed"
+            error "replace sites-enabled failed"
       exit 1
 fi
-
-    cp -r /srv/TEAMinternational_Learning/nginx/sites-enabled/*  /etc/nginx/sites-enabled/  &> $log_path/tmp.log
-if [ $? -eq 0 ];
-      then
-            info "sites-enabled complete"
-      else
-            tail -n20 $log_path/tmp.log
-            error "sites-enabled failed"
-      exit 1
-fi
-
 }
 
 test_after_configs () {
@@ -113,6 +150,8 @@ fi
 }
 
 main () {
+
+pre_install_nginx
 
 install_nginx
 
