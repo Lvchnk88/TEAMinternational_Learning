@@ -18,7 +18,7 @@ GIT_REPO="/srv/TEAMinternational_Learning"
 
 pre_install_nginx () {
 #Install the prerequisites
-    apt install curl gnupg2 ca-certificates lsb-release ubuntu-archive-keyring  &> $log_path/tmp.log
+    apt install curl gnupg2 ca-certificates lsb-release ubuntu-keyring  &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
             info "Install the prerequisites complete"
@@ -51,7 +51,7 @@ fi
 fi
 
 #set up the apt repository for stable nginx packages
-    echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg]  http://nginx.org/packages/ubuntu `lsb_release -cs` nginx" | sudo tee /etc/apt/sources.list.d/nginx.list  &> $log_path/tmp.log
+    echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/ubuntu `lsb_release -cs` nginx" | sudo tee /etc/apt/sources.list.d/nginx.list  &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
             info "set up the apt repository for stable nginx complete"
