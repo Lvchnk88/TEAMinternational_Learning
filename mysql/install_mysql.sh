@@ -14,6 +14,8 @@ error () {
 
 #=======================================
 
+GIT_REPO="/srv/TEAMinternational_Learning"
+
 install_mysql () {
     apt install mysql-server -y    &> $log_path/tmp.log
     if [ $? -eq 0 ];
@@ -37,23 +39,23 @@ install_mysql () {
 }
 
 replace_configs () {
-    cp -r /home/sergii/TEAMinternational_Learning/mysql/*       /etc/mysql/    &> $log_path/tmp.log
+    cp -r $GIT_REPO/mysql/*  /etc/mysql/    &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
-            info "replace mysql.cnf complete"
+            info "replace /mysql/* complete"
       else
             tail -n20 $log_path/tmp.log
-            error "replace mysql.cnf failed"
+            error "replace /mysql/* failed"
       exit 1
     fi
 
-    cp -r /home/sergii/TEAMinternational_Learning/mysql/mysql.conf.d/*  /etc/mysql/mysql.conf.d/    &> $log_path/tmp.log
+    cp -r $GIT_REPO/mysql/mysql.conf.d/*  /etc/mysql/mysql.conf.d/    &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
-            info "replace mysql.conf.d/ complete"
+            info "replace /mysql.conf.d/* complete"
       else
             tail -n20 $log_path/tmp.log
-            error "replace mysql.conf.d/ failed"
+            error "replace /mysql.conf.d/* failed"
       exit 1
     fi
 
@@ -63,10 +65,10 @@ enable_mysql () {
       systemctl enable mysql.service    &> $log_path/tmp.log
       if [ $? -eq 0 ];
           then
-              info "start enable_mysql complete"
+              info "enable_mysql complete"
           else
               tail -n20 $log_path/tmp.log
-              error "start enable_mysql failed"
+              error "enable_mysql failed"
           exit 1
     fi
 
@@ -77,10 +79,10 @@ start_mysql () {
     systemctl start mysql.service    &> $log_path/tmp.log
       if [ $? -eq 0 ];
           then
-                info "start start_mysql complete"
+                info "start_mysql complete"
           else
                 tail -n20 $log_path/tmp.log
-                error "start start_mysql failed"
+                error "start_mysql failed"
           exit 1
     fi
 }
