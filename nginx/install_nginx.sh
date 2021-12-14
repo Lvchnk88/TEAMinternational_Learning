@@ -39,17 +39,6 @@ fi
       exit 1
 fi
 
-#Verify that the downloaded file contains the proper key
-    gpg --dry-run --quiet --import --import-options import-show /usr/share/keyrings/nginx-archive-keyring.gpg  &> $log_path/tmp.log
-    if [ $? -eq 0 ];
-      then
-            info "Verify that the downloaded file complete"
-      else
-            tail -n20 $log_path/tmp.log
-            error "Verify that the downloaded file failed"
-      exit 1
-fi
-
 #set up the apt repository for stable nginx packages
     echo "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] http://nginx.org/packages/ubuntu `lsb_release -cs` nginx" | sudo tee /etc/apt/sources.list.d/nginx.list  &> $log_path/tmp.log
     if [ $? -eq 0 ];
@@ -96,16 +85,6 @@ if [ $? -eq 0 ];
       else
             tail -n20 $log_path/tmp.log
             error "replace nginx.conf  failed"
-      exit 1
-fi
-
-    cp -r $GIT_REPO/nginx/sites-enabled/*  /etc/nginx/sites-enabled/  &> $log_path/tmp.log
-if [ $? -eq 0 ];
-      then
-            info "replace sites-enabled complete"
-      else
-            tail -n20 $log_path/tmp.log
-            error "replace sites-enabled failed"
       exit 1
 fi
 }
