@@ -1,9 +1,21 @@
 #!/bin/bash
 
-GIT_REPO=/srv/TEAMinternational_Learning
+info () {
+    lgreen='\e[92m'
+    nc='\033[0m'
+    printf "${lgreen}[Info] ${@}${nc}\n"
+}
+
+error () {
+    lgreen='\033[0;31m'
+    nc='\033[0m'
+    printf "${lgreen}[Error] ${@}${nc}\n"
+}
+
+#=======================================
 
 install_nginx () {
-    sudo apt install nginx -y &> $log_path/tmp.log
+    apt install nginx -y     &> $log_path/tmp.log
 
 if [ $? -eq 0 ];
       then
@@ -15,21 +27,21 @@ if [ $? -eq 0 ];
 fi
 }
 
-stop_service () {
-    nginx -s quit  &> $log_path/tmp.log
+test_after_install () {
+     nginx -t                &> $log_path/tmp.log
 
 if [ $? -eq 0 ];
       then
-            info "stop_service complete"
+            info "test_after_install complete"
       else
             tail -n20 $log_path/tmp.log
-            error "stop_service failed"
+            error "test_after_install failed"
       exit 1
 fi
 }
 
 replace_configs () {
-    cp $GIT_REPO/nginx/nginx.conf  /etc/nginx/ &> $log_path/tmp.log
+    cp /srv/TEAMinternational_Learning/nginx/nginx.conf   /etc/nginx/   &> $log_path/tmp.log
 if [ $? -eq 0 ];
       then
             info "nginx.conf  complete"
@@ -39,7 +51,7 @@ if [ $? -eq 0 ];
       exit 1
 fi
 
-    cp $GIT_REPO/nginx/conf.d  /etc/nginx/conf.d/ &> $log_path/tmp.log
+    cp -r /srv/TEAMinternational_Learning/nginx/conf.d/*   /etc/nginx/conf.d/   &> $log_path/tmp.log
 if [ $? -eq 0 ];
       then
             info "conf.d complete"
@@ -49,7 +61,7 @@ if [ $? -eq 0 ];
       exit 1
 fi
 
-    cp $GIT_REPO/nginx/sites-enabled/ /etc/nginx/sites-enabled/ &> $log_path/tmp.log
+    cp -r /srv/TEAMinternational_Learning/nginx/sites-enabled/*  /etc/nginx/sites-enabled/  &> $log_path/tmp.log
 if [ $? -eq 0 ];
       then
             info "sites-enabled complete"
@@ -61,8 +73,34 @@ fi
 
 }
 
+test_after_configs () {
+     nginx -t                 &> $log_path/tmp.log
+
+if [ $? -eq 0 ];
+      then
+            info "test_after_configs complete"
+      else
+            tail -n20 $log_path/tmp.log
+            error "test_after_configs failed"
+      exit 1
+fi
+}
+
+enable_nginx () {
+     systemctl enable nginx     &> $log_path/tmp.log
+
+if [ $? -eq 0 ];
+      then
+            info "enable_nginx complete"
+      else
+            tail -n20 $log_path/tmp.log
+            error "enable_nginx failed"
+      exit 1
+fi
+}
+
 start_service () {
-    nginx -s reload    &> $log_path/tmp.log
+    systemctl restart nginx     &> $log_path/tmp.log
 
 if [ $? -eq 0 ];
       then
@@ -78,13 +116,16 @@ main () {
 
 install_nginx
 
-stop_service
+test_after_install
 
 replace_configs
+
+test_after_configs
+
+enable_nginx
 
 start_service
 
 }
 
 main
-

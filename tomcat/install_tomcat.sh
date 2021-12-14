@@ -1,7 +1,23 @@
 #!/bin/bash
 
+info () {
+    lgreen='\e[92m'
+    nc='\033[0m'
+    printf "${lgreen}[Info] ${@}${nc}\n"
+}
+
+error () {
+    lgreen='\033[0;31m'
+    nc='\033[0m'
+    printf "${lgreen}[Error] ${@}${nc}\n"
+}
+
+#=======================================
+
+GIT_REPO=/srv/TEAMinternational_Learning
+
 install_default_jdk() {
-    sudo apt install default-jdk &> $log_path/tmp.log
+    apt install default-jdk &> $log_path/tmp.log
 if [ $? -eq 0 ];
     then
         info "nstall_default_jdk complete"
@@ -13,7 +29,7 @@ fi
 }
 
 add_user () {
-    sudo useradd -m -U -d /opt/tomcat -s /bin/false tomcat &> $log_path/tmp.log
+    useradd -m -U -d /opt/tomcat -s /bin/false tomcat &> $log_path/tmp.log
 if [ $? -eq 0 ];
     then
         info "add_user complete"
@@ -50,8 +66,8 @@ fi
 }
 
 move_tomcat () {
-    sudo mkdir -p /opt/tomcat
-    sudo mv apache-tomcat-8.0.20/*  /opt/tomcat/ &> $log_path/tmp.log
+    mkdir -p /opt/tomcat
+    mv apache-tomcat-8.0.20/*  /opt/tomcat/ &> $log_path/tmp.log
 if [ $? -eq 0 ];
     then
         info "move_tomcat complete"
@@ -63,7 +79,7 @@ fi
 }
 
 hard_link () {
-    sudo ln -s /opt/tomcat/apache-tomcat-8.0.20 /opt/tomcat/latest &> $log_path/tmp.log
+    ln -s /opt/tomcat/apache-tomcat-8.0.20 /opt/tomcat/latest &> $log_path/tmp.log
 if [ $? -eq 0 ];
     then
         info "hard_link complete"
@@ -75,7 +91,7 @@ fi
 }
 
 add_owner () {
-    sudo chown -R tomcat.tomcat /opt/tomcat &> $log_path/tmp.log
+    chown -R tomcat.tomcat /opt/tomcat &> $log_path/tmp.log
 if [ $? -eq 0 ];
     then
         info "add_owner complete"
@@ -87,7 +103,7 @@ fi
 }
 
 add_permission () {
-    sudo sh -c 'chmod +x /opt/tomcat/latest/bin/*.sh' &> $log_path/tmp.log
+    sh -c 'chmod +x /opt/tomcat/bin/*.sh' &> $log_path/tmp.log
 if [ $? -eq 0 ];
     then
         info "add_permission complete"
@@ -99,7 +115,7 @@ fi
 }
 
 add_service () {
-    cat << EOF > /etc/systemd/system/tomcat.service &> $log_path/tmp.log
+    cat << EOF > /etc/systemd/system/tomcat.service
 [Unit]
 Description=Tomcat 8.0.20 servlet container
 After=network.target
@@ -113,13 +129,13 @@ Group=tomcat
 Environment="JAVA_HOME=/usr/lib/jvm/default-java"
 Environment="JAVA_OPTS=-Djava.security.egd=file:///dev/urandom"
 
-Environment="CATALINA_BASE=/opt/tomcat/latest"
-Environment="CATALINA_HOME=/opt/tomcat/latest"
-Environment="CATALINA_PID=/opt/tomcat/latest/temp/tomcat.pid"
+Environment="CATALINA_BASE=/opt/tomcat"
+Environment="CATALINA_HOME=/opt/tomcat"
+Environment="CATALINA_PID=/opt/tomcat/temp/tomcat.pid"
 Environment="CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC"
 
-ExecStart=/opt/tomcat/latest/bin/startup.sh
-ExecStop=/opt/tomcat/latest/bin/shutdown.sh
+ExecStart=/opt/tomcat/bin/startup.sh
+ExecStop=/opt/tomcat/bin/shutdown.sh
 
 [Install]
 WantedBy=multi-user.target
@@ -134,8 +150,20 @@ if [ $? -eq 0 ];
 fi
 }
 
+replace_server_xml () {
+    cp $GIT_REPO/tomcat/server.xml /etc/tomcat/  &> $log_path/tmp.log
+if [ $? -eq 0 ];
+    then
+        info "replace_server_xml complete"
+    else
+        tail -n20 $log_path/tmp.log
+        error "replace_server_xml failed"
+    exit 1
+fi
+}
+
 daemon_reload () {
-sudo systemctl daemon-reload
+    systemctl daemon-reload    &> $log_path/tmp.log
 if [ $? -eq 0 ];
     then
         info "add_service complete"
@@ -146,32 +174,8 @@ if [ $? -eq 0 ];
 fi
 }
 
-start_tomcat () {
-sudo systemctl start tomcat
-if [ $? -eq 0 ];
-    then
-        info "start_tomcat complete"
-    else
-        tail -n20 $log_path/tmp.log
-        error "start_tomcat failed"
-    exit 1
-fi
-}
-
-stop_tomcat () {
-sudo systemctl stop tomcat
-if [ $? -eq 0 ];
-    then
-        info "stop_tomcat complete"
-    else
-        tail -n20 $log_path/tmp.log
-        error "stop_tomcat failed"
-    exit 1
-fi
-}
-
 enable_tomcat () {
-sudo systemctl enable tomcat
+    systemctl enable tomcat    &> $log_path/tmp.log
 if [ $? -eq 0 ];
     then
         info "enable_tomcat complete"
@@ -183,7 +187,7 @@ fi
 }
 
 allow_8080 () {
-sudo ufw allow 8080
+    ufw allow 8080    &> $log_path/tmp.log
 if [ $? -eq 0 ];
     then
         info "allow_8080 complete"
@@ -194,7 +198,19 @@ if [ $? -eq 0 ];
 fi
 }
 
-main. () {
+start_tomcat () {
+    systemctl start tomcat    &> $log_path/tmp.log
+if [ $? -eq 0 ];
+    then
+        info "start_tomcat complete"
+    else
+        tail -n20 $log_path/tmp.log
+        error "start_tomcat failed"
+    exit 1
+fi
+}
+
+main () {
 
 install_default_jdk
 
@@ -214,16 +230,16 @@ add_permission
 
 add_service
 
+replace_server_xml
+
 daemon_reload
-
-start_tomcat
-sleep 5
-
-stop_tomcat
 
 enable_tomcat
 
 allow_8080
+
+start_tomcat
+
 }
 
 main
