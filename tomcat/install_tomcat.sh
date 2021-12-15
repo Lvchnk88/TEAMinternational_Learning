@@ -41,7 +41,7 @@ fi
 }
 
 add_user () {
-    useradd -m -U -d /opt/tomcat -s /bin/false tomcat   &> $log_path/tmp.log
+    if [grep -c '^tomcat:' /etc/passwd = 0]; then useradd -m -U -d /opt/tomcat -s /bin/false tomcat; fi   &> $log_path/tmp.log
 if [ $? -eq 0 ];
     then
         info "add_user complete"
@@ -79,7 +79,7 @@ fi
 
 move_tomcat () {
     mkdir -p /opt/tomcat
-    mv apache-tomcat-8.0.20  /opt/tomcat/    &> $log_path/tmp.log
+    mv  apache-tomcat-8.0.20  /opt/tomcat/    &> $log_path/tmp.log
 if [ $? -eq 0 ];
     then
         info "move_tomcat complete"
@@ -163,7 +163,7 @@ fi
 }
 
 replace_server_xml () {
-    cp $GIT_REPO/tomcat/server.xml /etc/tomcat/   &> $log_path/tmp.log
+    \cp -r $GIT_REPO/tomcat/server.xml /opt/tomcat/apache-tomcat-8.0.20/conf/   &> $log_path/tmp.log
 if [ $? -eq 0 ];
     then
         info "replace_server_xml complete"
