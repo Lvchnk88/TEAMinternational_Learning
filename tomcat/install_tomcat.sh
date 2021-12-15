@@ -29,7 +29,7 @@ fi
 }
 
 install_default_jdk() {
-    apt install default-jdk &> $log_path/tmp.log
+    apt install openjdk-8-jre-headless   &> $log_path/tmp.log
 if [ $? -eq 0 ];
     then
         info "nstall_default_jdk complete"
@@ -138,7 +138,7 @@ Type=forking
 User=tomcat
 Group=tomcat
 
-Environment="JAVA_HOME=/usr/lib/jvm/default-java"
+Environment="JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64"
 Environment="JAVA_OPTS=-Djava.security.egd=file:///dev/urandom"
 
 Environment="CATALINA_BASE=/opt/tomcat/latest"
