@@ -16,6 +16,18 @@ error () {
 
 GIT_REPO=/srv/TEAMinternational_Learning
 
+install_unzip_wget () {
+    apt install unzip wget    &> $log_path/tmp.log
+if [ $? -eq 0 ];
+    then
+        info "install_unzip_wget complete"
+    else
+        tail -n20 $log_path/tmp.log
+        error "install_unzip_wget failed"
+    exit 1
+fi
+}
+
 install_default_jdk() {
     apt install default-jdk &> $log_path/tmp.log
 if [ $? -eq 0 ];
@@ -29,7 +41,7 @@ fi
 }
 
 add_user () {
-    useradd -m -U -d /opt/tomcat -s /bin/false tomcat &> $log_path/tmp.log
+    useradd -m -U -d /opt/tomcat -s /bin/false tomcat   &> $log_path/tmp.log
 if [ $? -eq 0 ];
     then
         info "add_user complete"
@@ -42,7 +54,7 @@ fi
 
 get_tomcat () {
     cd /tmp
-    wget https://archive.apache.org/dist/tomcat/tomcat-8/v8.0.20/bin/apache-tomcat-8.0.20.zip &> $log_path/tmp.log
+    wget https://archive.apache.org/dist/tomcat/tomcat-8/v8.0.20/bin/apache-tomcat-8.0.20.zip  &> $log_path/tmp.log
 if [ $? -eq 0 ];
     then
         info "get_tomcat complete"
@@ -54,7 +66,7 @@ fi
 }
 
 unzip_tomcat () {
-    unzip apache-tomcat-8.0.20.zip &> $log_path/tmp.log
+    unzip apache-tomcat-8.0.20.zip      &> $log_path/tmp.log
 if [ $? -eq 0 ];
     then
         info "unzip_tomcat complete"
@@ -67,7 +79,7 @@ fi
 
 move_tomcat () {
     mkdir -p /opt/tomcat
-    mv apache-tomcat-8.0.20/*  /opt/tomcat/ &> $log_path/tmp.log
+    mv apache-tomcat-8.0.20  /opt/tomcat/    &> $log_path/tmp.log
 if [ $? -eq 0 ];
     then
         info "move_tomcat complete"
@@ -78,20 +90,20 @@ if [ $? -eq 0 ];
 fi
 }
 
-hard_link () {
-    ln -s /opt/tomcat/apache-tomcat-8.0.20 /opt/tomcat/latest &> $log_path/tmp.log
+create_a_symbolic_link () {
+    ln -s /opt/tomcat/apache-tomcat-8.0.20 /opt/tomcat/latest   &> $log_path/tmp.log
 if [ $? -eq 0 ];
     then
-        info "hard_link complete"
+        info "create_a_symbolic_link complete"
     else
         tail -n20 $log_path/tmp.log
-        error "hard_link failed"
+        error "create_a_symbolic_link failed"
     exit 1
 fi
 }
 
 add_owner () {
-    chown -R tomcat.tomcat /opt/tomcat &> $log_path/tmp.log
+    chown -R tomcat: /opt/tomcat       &> $log_path/tmp.log
 if [ $? -eq 0 ];
     then
         info "add_owner complete"
@@ -103,7 +115,7 @@ fi
 }
 
 add_permission () {
-    sh -c 'chmod +x /opt/tomcat/bin/*.sh' &> $log_path/tmp.log
+    sudo sh -c 'chmod +x /opt/tomcat/latest/bin/*.sh'    &> $log_path/tmp.log
 if [ $? -eq 0 ];
     then
         info "add_permission complete"
@@ -129,13 +141,13 @@ Group=tomcat
 Environment="JAVA_HOME=/usr/lib/jvm/default-java"
 Environment="JAVA_OPTS=-Djava.security.egd=file:///dev/urandom"
 
-Environment="CATALINA_BASE=/opt/tomcat"
-Environment="CATALINA_HOME=/opt/tomcat"
-Environment="CATALINA_PID=/opt/tomcat/temp/tomcat.pid"
+Environment="CATALINA_BASE=/opt/tomcat/latest"
+Environment="CATALINA_HOME=/opt/tomcat/latest"
+Environment="CATALINA_PID=/opt/tomcat/latest/temp/tomcat.pid"
 Environment="CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC"
 
-ExecStart=/opt/tomcat/bin/startup.sh
-ExecStop=/opt/tomcat/bin/shutdown.sh
+ExecStart=/opt/tomcat/latest/bin/startup.sh
+ExecStop=/opt/tomcat/latest/bin/shutdown.sh
 
 [Install]
 WantedBy=multi-user.target
@@ -151,7 +163,7 @@ fi
 }
 
 replace_server_xml () {
-    cp $GIT_REPO/tomcat/server.xml /etc/tomcat/  &> $log_path/tmp.log
+    cp $GIT_REPO/tomcat/server.xml /etc/tomcat/   &> $log_path/tmp.log
 if [ $? -eq 0 ];
     then
         info "replace_server_xml complete"
@@ -163,7 +175,7 @@ fi
 }
 
 daemon_reload () {
-    systemctl daemon-reload    &> $log_path/tmp.log
+    systemctl daemon-reload     &> $log_path/tmp.log
 if [ $? -eq 0 ];
     then
         info "add_service complete"
@@ -175,7 +187,7 @@ fi
 }
 
 enable_tomcat () {
-    systemctl enable tomcat    &> $log_path/tmp.log
+    systemctl enable tomcat     &> $log_path/tmp.log
 if [ $? -eq 0 ];
     then
         info "enable_tomcat complete"
@@ -202,7 +214,7 @@ start_tomcat () {
     systemctl start tomcat    &> $log_path/tmp.log
 if [ $? -eq 0 ];
     then
-        info "start_tomcat complete"
+        info "start_tomcat complete"vim
     else
         tail -n20 $log_path/tmp.log
         error "start_tomcat failed"
@@ -211,6 +223,7 @@ fi
 }
 
 main () {
+install_unzip_wget
 
 install_default_jdk
 
@@ -222,7 +235,7 @@ unzip_tomcat
 
 move_tomcat
 
-hard_link
+create_a_symbolic_link
 
 add_owner
 
