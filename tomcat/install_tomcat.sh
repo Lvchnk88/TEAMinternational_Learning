@@ -28,7 +28,7 @@ if [ $? -eq 0 ];
 fi
 }
 
-install_default_jdk() {
+install_default_jdk () {
     apt install openjdk-8-jre-headless   &> $log_path/tmp.log
 if [ $? -eq 0 ];
     then
@@ -41,7 +41,7 @@ fi
 }
 
 add_user () {
-    if [grep -c '^tomcat:' /etc/passwd = 0]; then useradd -m -U -d /opt/tomcat -s /bin/false tomcat; fi   &> $log_path/tmp.log
+    useradd -m -U -d /opt/tomcat -s /bin/false tomcat   &> $log_path/tmp.log
 if [ $? -eq 0 ];
     then
         info "add_user complete"
@@ -103,7 +103,7 @@ fi
 }
 
 add_owner () {
-    chown -R tomcat: /opt/tomcat       &> $log_path/tmp.log
+    chown -R tomcat: /opt/tomcat      &> $log_path/tmp.log
 if [ $? -eq 0 ];
     then
         info "add_owner complete"
