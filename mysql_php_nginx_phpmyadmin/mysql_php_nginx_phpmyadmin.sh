@@ -18,28 +18,26 @@ error () {
 GIT_REPO="/srv/TEAMinternational_Learning"
 
 
-install_php_mysql () {
-    apt install php-mysql    &> $log_path/tmp.log
+install_mysql () {
+    apt install mysql-server -y    &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
-            info "install_php_mysql complete"
+            info "install mysql-server complete"
       else
             tail -n20 $log_path/tmp.log
-            error "install_php_mysql failed"
+            error "install mysql-server failed"
       exit 1
     fi
-}
 
-restart_php_mysql () {
-    systemctl restart php-mysql    &> $log_path/tmp.log
+    systemctl enable mysql.service    &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
-            info "restart_php_mysql complete"
+            info "enable mysql.service complete"
       else
             tail -n20 $log_path/tmp.log
-            error "restart_php_mysql failed"
+            error "enable mysql.service failed"
       exit 1
-    fi      
+    fi
 }
 
 
@@ -52,19 +50,6 @@ install_php () {
       else
             tail -n20 $log_path/tmp.log
             error "install install_php failed"
-      exit 1
-    fi
-}
-
-
-configure_php () {
-    cp $GIT_REPO/php/info.php  /var/www/html/    &> $log_path/tmp.log
-    if [ $? -eq 0 ];
-      then
-            info "configure_php complete"
-      else
-            tail -n20 $log_path/tmp.log
-            error "configure_php failed"
       exit 1
     fi
 }
@@ -208,18 +193,12 @@ install_php_my_admin () {
     fi	
 }
 
-configure_php_my_admin () {
-
-}
-
 
 main () {
 
-install_php_mysql
-restart_php_mysql
+install_mysql
 
 install_php
-configure_php
 
 pre_install_nginx
 install_nginx
@@ -230,43 +209,9 @@ enable_nginx
 start_nginx
 
 install_php_my_admin
-configure_php_my_admin
+#configure_php_my_admin
 }
 
 main
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
