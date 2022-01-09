@@ -19,7 +19,7 @@ GIT_REPO="/srv/TEAMinternational_Learning"
 
 
 install_mysql () {
-    apt install mysql-server -y    &> $log_path/tmp.log
+    yes | apt install mysql-server    &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
             info "install mysql-server complete"
@@ -43,7 +43,7 @@ install_mysql () {
 
 install_php () {
     apt update
-    apt install php-fpm    &> $log_path/tmp.log
+    yes | apt install php-fpm    &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
             info "install install_php complete"
@@ -57,7 +57,7 @@ install_php () {
 
 pre_install_nginx () {
 #Install the prerequisites
-    apt install curl gnupg2 ca-certificates lsb-release ubuntu-keyring  &> $log_path/tmp.log
+    yes | apt install curl gnupg2 ca-certificates lsb-release ubuntu-keyring  &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
             info "Install the prerequisites complete"
@@ -68,6 +68,8 @@ pre_install_nginx () {
     fi
 
 #Import an official nginx signing key so apt could verify the packages authenticity. Fetch the key
+    mkdir /root/.gnupg
+    touch /root/.gnupg/pubring.kbx
     curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor | sudo tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null  &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
@@ -103,8 +105,8 @@ pre_install_nginx () {
 
 
 install_nginx () {
-    sudo apt update
-    sudo apt install nginx   &> $log_path/tmp.log
+    yes | apt update
+    yes | apt install nginx   &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
             info "install_nginx complete"
@@ -131,6 +133,7 @@ configure_nginx () {
 
 
 create_a_symbolic_link () {
+    mkdir /etc/nginx/sites-enabled
     ln -s /etc/nginx/sites-available/example.com /etc/nginx/sites-enabled/   &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
@@ -182,7 +185,7 @@ start_nginx () {
 
 
 install_php_my_admin () {
-    sudo apt install phpmyadmin    &> $log_path/tmp.log
+    yes | apt install phpmyadmin    &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
             info "install install_php_my_admin complete"
@@ -209,7 +212,6 @@ enable_nginx
 start_nginx
 
 install_php_my_admin
-#configure_php_my_admin
 }
 
 main
