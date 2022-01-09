@@ -19,6 +19,7 @@ GIT_REPO="/srv/TEAMinternational_Learning"
 
 
 install_mysql () {
+    apt update
     yes | apt install mysql-server    &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
@@ -185,6 +186,7 @@ start_nginx () {
 
 
 install_php_my_admin () {
+    export DEBIAN_FRONTEND=noninteractive	
     yes | apt install phpmyadmin    &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
