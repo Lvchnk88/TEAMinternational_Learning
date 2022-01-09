@@ -19,7 +19,6 @@ GIT_REPO="/srv/TEAMinternational_Learning"
 
 
 install_mysql () {
-    apt update
     yes | apt install mysql-server    &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
@@ -43,7 +42,7 @@ install_mysql () {
 
 
 install_php () {
-    apt update
+    apt update      &> $log_path/tmp.log
     yes | apt install php-fpm    &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
@@ -71,7 +70,7 @@ pre_install_nginx () {
 #Import an official nginx signing key so apt could verify the packages authenticity. Fetch the key
     mkdir /root/.gnupg
     touch /root/.gnupg/pubring.kbx
-    curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor | sudo tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null  &> $log_path/tmp.log
+    curl https://nginx.org/keys/nginx_signing.key | gpg --dearmor | sudo tee /usr/share/keyrings/nginx-archive-keyring.gpg  &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
             info "Import an official nginx signing key complete"
@@ -106,7 +105,7 @@ pre_install_nginx () {
 
 
 install_nginx () {
-    yes | apt update
+    yes | apt update      &> $log_path/tmp.log
     yes | apt install nginx   &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
@@ -186,7 +185,7 @@ start_nginx () {
 
 
 install_php_my_admin () {
-    export DEBIAN_FRONTEND=noninteractive	
+    export DEBIAN_FRONTEND=noninteractive 
     yes | apt install phpmyadmin    &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
