@@ -63,7 +63,7 @@ add_user_to_mysql () {
 }
 
 install_php-fpm () {
-    yes | apt-get install software-properties-common    &> $log_path/tmp.log
+    yes | apt install software-properties-common    &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
             info "software-properties-common complete"
@@ -73,7 +73,7 @@ install_php-fpm () {
       exit 1
     fi
 
-    yes | add-apt-repository ppa:ondrej/php    &> $log_path/tmp.log
+    add-apt-repository ppa:ondrej/php    &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
             info "add-apt-repository complete"
@@ -83,7 +83,7 @@ install_php-fpm () {
       exit 1
     fi
 
-    yes | apt update     &> $log_path/tmp.log
+    apt update     &> $log_path/tmp.log
 
     yes | apt install php8.0-fpm php8.0-common php8.0-mysql php8.0-gmp php8.0-curl php8.0-intl php8.0-mbstring php8.0-xmlrpc php8.0-gd php8.0-xml php8.0-cli php8.0-zip    &> $log_path/tmp.log
     if [ $? -eq 0 ];
@@ -97,7 +97,7 @@ install_php-fpm () {
 }
 
 install_nginx () {
-    yes | apt update          &> $log_path/tmp.log
+    apt update          &> $log_path/tmp.log
     yes | apt install nginx   &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
@@ -107,6 +107,8 @@ install_nginx () {
             error "install_nginx failed"
       exit 1
     fi
+
+    systemctl enable nginx.service
 }
 
 
