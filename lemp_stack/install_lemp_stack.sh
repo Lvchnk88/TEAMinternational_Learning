@@ -98,7 +98,7 @@ install_php-fpm () {
 
 install_nginx () {
     apt update          &> $log_path/tmp.log
-    yes | apt install nginx   &> $log_path/tmp.log
+    yes | apt install nginx        &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
             info "install_nginx complete"
@@ -126,7 +126,7 @@ install_php_my_admin () {
 }
 
 
-configuring_phpmyadmin () {
+configuring_ssl_hginx () {
     cp $GIT_REPO/lemp_stack/phpmyadmin.conf   /etc/nginx/snippets/    &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
@@ -147,9 +147,37 @@ configuring_phpmyadmin () {
       exit 1
     fi
 
-    systemctl restart nginx    &> $log_path/tmp.log
+    cp $GIT_REPO/lemp_stack/php_my_admin.key   /etc/ssl/private/     &> $log_path/tmp.log
+    if [ $? -eq 0 ];
+      then
+            info "coppy php_my_admin.key complete"
+      else
+            tail -n20 $log_path/tmp.log
+            error "coppy php_my_admin.key failed"
+      exit 1
+    fi
 
-    nginx -t     &> $log_path/tmp.log
+    cp $GIT_REPO/lemp_stack/php_my_admin.pem   /etc/ssl/certs/       &> $log_path/tmp.log
+    if [ $? -eq 0 ];
+      then
+            info "coppy php_my_admin.pem complete"
+      else
+            tail -n20 $log_path/tmp.log
+            error "coppy php_my_admin.pem failed"
+      exit 1
+    fi
+
+    systemctl restart nginx                &> $log_path/tmp.log
+    if [ $? -eq 0 ];
+      then
+            info "restart nginx complete"
+      else
+            tail -n20 $log_path/tmp.log
+            error "restart nginx failed"
+      exit 1
+    fi
+
+    nginx -t                               &> $log_path/tmp.log
     if [ $? -eq 0 ];
       then
             info "test nginx complete"
@@ -171,9 +199,9 @@ install_php-fpm
 
 install_nginx
 
-install_php_my_admin
+configuring_ssl_hginx
 
-configuring_phpmyadmin
+install_php_my_admin
 
 }
 
