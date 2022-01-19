@@ -1,0 +1,7 @@
+#unamw.yml
+---
+  - hosts: webservers:haproxy
+    tasks: 
+      - name: Get OS type
+        shell: uname
+

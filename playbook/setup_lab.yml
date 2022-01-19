@@ -1,0 +1,8 @@
+#setup_lad.yml
+---
+  - hosts: webservers:haproxy
+    become: true
+    become_user: root
+    tasks:
+      - name: Update apt packages
+        apt: name=* state=latest
